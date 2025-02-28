@@ -3,8 +3,12 @@ import cors from 'cors';
 import fetch from 'node-fetch';
 
 const app = express();
-app.use(cors()); // Allow all origins
-app.use(express.json()); // Enable JSON parsing
+// ✅ Allow CORS for all origins with explicit headers
+app.use(cors({ origin: '*' })); 
+app.use(express.json()); 
+
+// ✅ Handle Preflight (OPTIONS) Requests
+app.options('*', cors());
 
 // GET request proxy
 app.post('/proxy/swap_quote', async (req, res) => {
@@ -17,6 +21,7 @@ app.post('/proxy/swap_quote', async (req, res) => {
       });
   
       const data = await response.json();
+      res.setHeader('Access-Control-Allow-Origin', '*'); // ✅ Explicitly allow CORS
       res.json(data);
     } catch (error) {
       res.status(500).json({ error: 'Failed to fetch swap quote' });
